@@ -187,7 +187,7 @@ my-web3-app/
    ```
     - In a separate terminal (from `hardhat/`):
       ```bash
-      npx hardhat ignition deplay ignition/modules/ --network hardhat
+      npx hardhat ignition deplay ignition/modules/ --network localhost
       ```
     - Note the deployed contract address (e.g., `0x...`).
 
@@ -320,7 +320,7 @@ my-web3-app/
       ```
     - Deploy (in a separate terminal from `hardhat/`):
       ```bash
-      npx hardhat ignition deplay ignition/modules/Lock.ts --network hardhat
+      npx hardhat ignition deplay ignition/modules/Lock.ts --network localhost
       ```
 
 2. **Start Next.js**:

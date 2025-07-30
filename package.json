@@ -10,7 +10,7 @@
     "clean": "cd hardhat && npx hardhat clean",
     "compile": "cd hardhat && npx hardhat compile",
     "node": "cd hardhat && npx hardhat node",
-    "deploy:local": "cd hardhat && npx hardhat ignition deploy ignition/modules/TokenFactory.ts --network hardhat",
+    "deploy:local": "cd hardhat && npx hardhat ignition deploy ignition/modules/TokenFactory.ts --network localhost",
     "test": "cd hardhat && npx hardhat test"
   },
   "dependencies": {
