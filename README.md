@@ -187,7 +187,7 @@ my-web3-app/
    ```
     - In a separate terminal (from `hardhat/`):
       ```bash
-      npx hardhat run ignition/modules/ --network hardhat
+      npx hardhat ignition deplay ignition/modules/ --network hardhat
       ```
     - Note the deployed contract address (e.g., `0x...`).
 
@@ -320,7 +320,7 @@ my-web3-app/
       ```
     - Deploy (in a separate terminal from `hardhat/`):
       ```bash
-      npx hardhat run ignition/modules/TokenFactory.ts --network hardhat
+      npx hardhat ignition deplay ignition/modules/Lock.ts --network hardhat
       ```
 
 2. **Start Next.js**:
@@ -367,7 +367,7 @@ To deploy to the Sepolia testnet:
 3. Deploy to Sepolia:
    ```bash
    cd hardhat
-   npx hardhat run ignition/modules/ --network sepolia
+   npx hardhat ignition deplay ignition/modules/ --network sepolia
    ```
     - Note the deployed contract address.
 
