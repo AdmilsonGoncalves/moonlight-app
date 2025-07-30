@@ -136,7 +136,7 @@ my-web3-app/
    }
    ```
 
-5. Create a deployment script (`hardhat/scripts/deploy.ts`):
+5. Create a deployment script (`hardhat/ignition/modules/`):
    ```typescript
    import { ethers } from "hardhat";
 
@@ -187,7 +187,7 @@ my-web3-app/
    ```
     - In a separate terminal (from `hardhat/`):
       ```bash
-      npx hardhat run scripts/deploy.ts --network hardhat
+      npx hardhat run ignition/modules/ --network hardhat
       ```
     - Note the deployed contract address (e.g., `0x...`).
 
@@ -320,7 +320,7 @@ my-web3-app/
       ```
     - Deploy (in a separate terminal from `hardhat/`):
       ```bash
-      npx hardhat run scripts/deploy.ts --network hardhat
+      npx hardhat run ignition/modules/TokenFactory.ts --network hardhat
       ```
 
 2. **Start Next.js**:
@@ -367,7 +367,7 @@ To deploy to the Sepolia testnet:
 3. Deploy to Sepolia:
    ```bash
    cd hardhat
-   npx hardhat run scripts/deploy.ts --network sepolia
+   npx hardhat run ignition/modules/ --network sepolia
    ```
     - Note the deployed contract address.
 

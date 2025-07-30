@@ -1,7 +1,14 @@
 {
   "name": "hardhat-project",
+  "scripts": {
+    "hardhat compile": "npx hardhat compile",
+    "hardhat clean": "npx hardhat clean",
+    "hardhat test": "npx hardhat test",
+    "deploy local": "npx hardhat ignition deploy ignition/modules/TokenFactory.ts --network hardhat"
+  },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^6.1.0",
+    "@openzeppelin/contracts": "^5.4.0",
     "@types/chai": "^4.3.20",
     "@types/mocha": "^10.0.10",
     "@types/node": "^24.1.0",
