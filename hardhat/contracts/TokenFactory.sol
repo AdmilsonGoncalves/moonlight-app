@@ -9,49 +9,31 @@ import "hardhat/console.sol";
  * @dev Manages the creation and sale of ERC20 tokens. Allows creators to deploy tokens, buyers to purchase tokens, and creators to finalize sales by transferring remaining tokens and ETH to a liquidity pool or creator.
  */
 contract TokenFactory {
-    /**
-     * @dev Target ETH amount to raise per token sale (3 ETH).
-     */
+     // @dev Target ETH amount to raise per token sale (3 ETH).
     uint256 public constant TARGET = 3 ether;
 
-    /**
-     * @dev Maximum tokens to sell per sale (500,000 tokens in wei).
-     */
+     // @dev Maximum tokens to sell per sale (500,000 tokens in wei).
     uint256 public constant TOKEN_LIMIT = 500_000 ether;
 
-    /**
-     * @dev Total supply of tokens created per sale (1,000,000 tokens in wei).
-     */
+     // @dev Total supply of tokens created per sale (1,000,000 tokens in wei).
     uint256 public constant TOTAL_SUPPLY = 1_000_000 ether;
 
-    /**
-     * @dev Minimum purchase amount per transaction (1 token in wei).
-     */
+     // @dev Minimum purchase amount per transaction (1 token in wei).
     uint256 public constant MIN_PURCHASE = 1 ether;
 
-    /**
-     * @dev Maximum purchase amount per transaction (10,000 tokens in wei).
-     */
+     // @dev Maximum purchase amount per transaction (10,000 tokens in wei).
     uint256 public constant MAX_PURCHASE = 10_000 ether;
 
-    /**
-     * @dev Immutable fee required to create a token, set during deployment.
-     */
+     // @dev Immutable fee required to create a token, set during deployment.
     uint256 public immutable fee;
 
-    /**
-     * @dev Address of the contract owner (deployer), who can withdraw funds.
-     */
+     // @dev Address of the contract owner (deployer), who can withdraw funds.
     address public owner;
 
-    /**
-     * @dev Total number of tokens created.
-     */
+     // @dev Total number of tokens created.
     uint256 public totalTokens;
 
-    /**
-     * @dev Array storing addresses of all created tokens.
-     */
+     // @dev Array storing addresses of all created tokens.
     address[] public tokenAddresses;
 
     /**
@@ -135,7 +117,7 @@ contract TokenFactory {
         require(_amount >= MIN_PURCHASE, "Factory: Amount too low");
         require(_amount <= MAX_PURCHASE, "Factory: Amount exceeded");
 
-        uint256 costPerToken = getCostPerToken(sale.sold);
+        uint256 costPerToken = getCost(sale.sold);
         uint256 totalPrice = costPerToken * (_amount / 10 ** 18);
         require(msg.value >= totalPrice, "Factory: Insufficient ETH received");
 
@@ -155,7 +137,7 @@ contract TokenFactory {
      * @param _sold Total tokens sold in the sale (in wei).
      * @return Cost of one token (in wei).
      */
-    function getCostPerToken(uint256 _sold) public pure returns (uint256) {
+    function getCost(uint256 _sold) public pure returns (uint256) {
         uint256 floor = 0.0001 ether;
         uint256 step = 0.0001 ether;
         uint256 increment = 10_000 ether;

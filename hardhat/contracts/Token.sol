@@ -37,7 +37,6 @@ contract Token is ERC20 {
 
         // Sets 'owner' to the address that deploys the contract (msg.sender).
         // 'payable' ensures the address can receive Ether if needed.
-        console.log("Owner contract deployed by:", msg.sender);
         owner = payable(msg.sender);
 
         // Assigns the provided '_creator' address to the 'creator' state variable.
