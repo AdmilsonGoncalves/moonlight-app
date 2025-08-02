@@ -40,6 +40,7 @@
     "ethers": "^6.15.0",
     "hardhat": "^2.26.1",
     "tailwindcss": "^4",
+    "typechain": "^8.3.2",
     "typescript": "^5"
   }
 }

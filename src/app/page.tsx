@@ -1,103 +1,165 @@
-import Image from "next/image";
+"use client"
+
+import { useEffect, useState } from "react"
+import { ethers } from 'ethers'
+
+// Components
+import Header from "./components/Header"
+import List from "./components/List"
+import Token from "./components/Token"
+import Trade from "./components/Trade"
+
+// ABIs & Config
+import Factory from "./abis/TokenFactory.json"
+import config from "./config.json"
+import images from "./resources/images.json"
+import TokenData from '@/app/model/token-data';
+
+interface Config {
+  [chainId: string]: {
+    factory: {
+      address: string;
+    };
+  };
+}
 
 export default function Home() {
-  return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [provider, setProvider] = useState<ethers.BrowserProvider | null>(null);
+  const [account, setAccount] = useState<string | null>(null);
+  const [factory, setFactory] = useState<ethers.Contract | null>(null);
+  const [fee, setFee] = useState<string>("0");
+  const [tokens, setTokens] = useState<TokenData[]>([]);
+  const [token, setToken] = useState<TokenData | null>(null);
+  const [showCreate, setShowCreate] = useState<boolean>(false);
+  const [showTrade, setShowTrade] = useState<boolean>(false);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+  function toggleCreate(): void {
+    setShowCreate(!showCreate);
+  }
+
+  function toggleTrade(token: TokenData): void {
+    setToken(token);
+    setShowTrade(!showTrade);
+  }
+
+  async function loadBlockchainData(): Promise<void> {
+    try {
+      // Use MetaMask for our connection
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      setProvider(provider);
+
+      // Get the current network
+      const network = await provider.getNetwork();
+
+      // Create reference to Factory contract
+      const typedConfig: Config = config;
+      if (!typedConfig[network.chainId.toString()] || !typedConfig[network.chainId.toString()].factory) {
+        throw new Error(`Factory address not found for chainId: ${network.chainId}`);
+      }
+
+      const factory = new ethers.Contract(
+        typedConfig[network.chainId.toString()].factory.address,
+        Factory,
+        provider
+      );
+      setFactory(factory  );
+
+      // Fetch the fee
+      const fee = await factory.fee();
+      setFee(fee.toString());
+
+      // Prepare to fetch token details
+      const totalTokens = Number(await factory.totalTokens());
+      const tokens: TokenData[] = [];
+
+      // We'll get the first 6 tokens listed
+      for (let i = 0; i < totalTokens && i < 6; i++) {
+        const tokenSale = await factory.getTokenSale(i);
+
+        // Create token object with extra fields
+        const token: TokenData = {
+          token: tokenSale.token,
+          name: tokenSale.name,
+          creator: tokenSale.creator,
+          sold: Number(tokenSale.sold),
+          raised: tokenSale.raised.toString(),
+          isOpen: tokenSale.isOpen,
+          image: images[i]
+        };
+
+        tokens.push(token);
+      }
+
+      // Reverse the array to show most recent first
+      setTokens(tokens.reverse());
+    } catch (error) {
+      console.error("Error loading blockchain data:", error);
+    }
+  }
+
+  useEffect(() => {
+    loadBlockchainData();
+  }, [showCreate, showTrade]);
+
+  return (
+    <div className="page">
+      <Header account={account} setAccount={setAccount} />
+
+      <main>
+        <div className="create">
+          <button
+            onClick={factory && account ? toggleCreate : undefined}
+            className="btn--fancy"
+            disabled={!factory || !account}
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+            {!factory ? (
+              "[ contract not deployed ]"
+            ) : !account ? (
+              "[ please connect ]"
+            ) : (
+              "[ start a new token ]"
+            )}
+          </button>
         </div>
+
+        <div className="listings">
+          <h1>new listings</h1>
+
+          <div className="tokens">
+            {!account ? (
+              <p>please connect wallet</p>
+            ) : tokens.length === 0 ? (
+              <p>No tokens listed</p>
+            ) : (
+              tokens.map((token, index) => (
+                <Token
+                  toggleTrade={toggleTrade}
+                  token={token}
+                  key={index}
+                />
+              ))
+            )}
+          </div>
+        </div>
+
+        {showCreate && factory && provider && (
+          <List
+            toggleCreate={toggleCreate}
+            fee={fee}
+            provider={provider}
+            factory={factory}
+          />
+        )}
+
+        {showTrade && token && provider && factory && (
+          <Trade
+            toggleTrade={toggleTrade}
+            token={token}
+            provider={provider}
+            factory={factory}
+          />
+        )}
       </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
     </div>
   );
 }
