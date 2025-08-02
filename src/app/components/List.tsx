@@ -1,4 +1,4 @@
-import { ethers } from "ethers";
+import { ethers } from 'ethers';
 import { TokenFactory } from '../../../types/ethers-contracts';
 
 interface ListProps {
@@ -11,17 +11,21 @@ interface ListProps {
 function List({ toggleCreate, fee, provider, factory }: ListProps) {
   async function listHandler(form: FormData): Promise<void> {
     try {
-      const name = form.get("name") as string;
-      const ticker = form.get("ticker") as string;
+      const name = form.get('name') as string;
+      const ticker = form.get('ticker') as string;
+
+      if (!name?.trim() || !ticker?.trim()) {
+        alert('Please provide both name and ticker');
+        return;
+      }
 
       const signer = await provider.getSigner();
-
       const transaction = await factory.connect(signer).create(name, ticker, { value: fee });
       await transaction.wait();
 
       toggleCreate();
     } catch (error) {
-      console.error("Error listing token:", error);
+      console.error('Error listing token:', error);
     }
   }
 

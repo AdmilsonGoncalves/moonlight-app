@@ -14,6 +14,7 @@ import Factory from "./abis/TokenFactory.json"
 import config from "./config.json"
 import images from "./resources/images.json"
 import TokenData from '@/app/model/token-data';
+import { TokenFactory } from '../../types/ethers-contracts';
 
 interface Config {
   [chainId: string]: {
@@ -26,7 +27,7 @@ interface Config {
 export default function Home() {
   const [provider, setProvider] = useState<ethers.BrowserProvider | null>(null);
   const [account, setAccount] = useState<string | null>(null);
-  const [factory, setFactory] = useState<ethers.Contract | null>(null);
+  const [factory, setFactory] = useState<TokenFactory | null>(null);
   const [fee, setFee] = useState<string>("0");
   const [tokens, setTokens] = useState<TokenData[]>([]);
   const [token, setToken] = useState<TokenData | null>(null);
@@ -62,7 +63,7 @@ export default function Home() {
         Factory,
         provider
       );
-      setFactory(factory  );
+      setFactory(factory);
 
       // Fetch the fee
       const fee = await factory.fee();
@@ -81,7 +82,7 @@ export default function Home() {
           token: tokenSale.token,
           name: tokenSale.name,
           creator: tokenSale.creator,
-          sold: Number(tokenSale.sold),
+          sold: tokenSale.sold,
           raised: tokenSale.raised.toString(),
           isOpen: tokenSale.isOpen,
           image: images[i]
@@ -98,8 +99,8 @@ export default function Home() {
   }
 
   useEffect(() => {
-    loadBlockchainData();
-  }, [showCreate, showTrade]);
+    void loadBlockchainData();
+  }, []);
 
   return (
     <div className="page">

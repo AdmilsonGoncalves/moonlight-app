@@ -4,6 +4,12 @@
 */
 
 // Extend the Window interface to include ethereum
-interface Window {
-  ethereum?: ethers.providers.ExternalProvider;
+import type { ExternalProvider } from '@ethersproject/providers';
+
+declare global {
+  interface Window {
+    ethereum?: ExternalProvider;
+  }
 }
+
+export {};

@@ -21,11 +21,10 @@ function Trade({ toggleTrade, token, provider, factory }: TradeProps) {
       const amount = form.get('amount') as string;
       const parsedAmount = ethers.parseUnits(amount, 18); // Parse amount to wei (assuming 18 decimals)
       const cost = await factory.getCost(token.sold); // Ensure token.sold is a bigint
-      const totalCost = cost * BigInt(amount); // Ensure multiplication is correct
-
+      const totalCost = cost * parsedAmount / ethers.parseUnits('1', 18); // Calculate total cost for the amount of tokens
       const signer = await provider.getSigner();
       const transaction = await factory.connect(signer).buy(token.token, parsedAmount, {
-        value: totalCost,
+        value: totalCost
       });
       await transaction.wait();
 
@@ -35,24 +34,25 @@ function Trade({ toggleTrade, token, provider, factory }: TradeProps) {
     }
   }
 
-  async function getSaleDetails(): Promise<void> {
-    try {
-      const target = await factory.TARGET();
-      setTarget(target);
-
-      const limit = await factory.TOKEN_LIMIT();
-      setLimit(limit);
-
-      const cost = await factory.getCost(token.sold);
-      setCost(cost);
-    } catch (error) {
-      console.error('Error fetching sale details:', error);
-    }
-  }
-
   useEffect(() => {
+
+    async function getSaleDetails(): Promise<void> {
+      try {
+        const target = await factory.TARGET();
+        setTarget(target);
+
+        const limit = await factory.TOKEN_LIMIT();
+        setLimit(limit);
+
+        const cost = await factory.getCost(token.sold);
+        setCost(cost);
+      } catch (error) {
+        console.error('Error fetching sale details:', error);
+      }
+    }
+
     void getSaleDetails();
-  }, []);
+  }, [token.sold, factory]);
 
   return (
     <div className="trade">
@@ -62,7 +62,7 @@ function Trade({ toggleTrade, token, provider, factory }: TradeProps) {
         <p className="name">{token.name}</p>
         <p>creator: {token.creator.slice(0, 6) + '...' + token.creator.slice(38, 42)}</p>
         <Image src={token.image} alt="Pepe" width={256} height={256} />
-        <p>marketcap: {ethers.formatUnits(token.raised, 18)} ETH</p>
+        <p>market cap: {ethers.formatUnits(token.raised, 18)} ETH</p>
         <p>base cost: {ethers.formatUnits(cost, 18)} ETH</p>
       </div>
 

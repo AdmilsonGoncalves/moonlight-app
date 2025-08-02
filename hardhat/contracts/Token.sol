@@ -6,7 +6,6 @@ pragma solidity 0.8.28;
  * Token contract: A custom ERC20 token implementation.
  * Inherits from OpenZeppelin's ERC20 for standard token behavior.
  */
-import "hardhat/console.sol";
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 // Declares a new contract named 'Token' that inherits from OpenZeppelin's ERC20 contract.

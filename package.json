@@ -16,7 +16,8 @@
   "dependencies": {
     "next": "15.4.4",
     "react": "19.1.0",
-    "react-dom": "19.1.0"
+    "react-dom": "19.1.0",
+    "ethers": "^6.15.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
@@ -37,7 +38,6 @@
     "dotenv": "^17.2.1",
     "eslint": "^9",
     "eslint-config-next": "15.4.4",
-    "ethers": "^6.15.0",
     "hardhat": "^2.26.1",
     "tailwindcss": "^4",
     "typechain": "^8.3.2",

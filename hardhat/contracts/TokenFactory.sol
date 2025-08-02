@@ -2,38 +2,37 @@
 pragma solidity 0.8.28;
 
 import {Token} from "./Token.sol";
-import "hardhat/console.sol";
 
 /**
  * @title TokenFactory
  * @dev Manages the creation and sale of ERC20 tokens. Allows creators to deploy tokens, buyers to purchase tokens, and creators to finalize sales by transferring remaining tokens and ETH to a liquidity pool or creator.
  */
 contract TokenFactory {
-     // @dev Target ETH amount to raise per token sale (3 ETH).
+    // @dev Target ETH amount to raise per token sale (3 ETH).
     uint256 public constant TARGET = 3 ether;
 
-     // @dev Maximum tokens to sell per sale (500,000 tokens in wei).
+    // @dev Maximum tokens to sell per sale (500,000 tokens in wei).
     uint256 public constant TOKEN_LIMIT = 500_000 ether;
 
-     // @dev Total supply of tokens created per sale (1,000,000 tokens in wei).
+    // @dev Total supply of tokens created per sale (1,000,000 tokens in wei).
     uint256 public constant TOTAL_SUPPLY = 1_000_000 ether;
 
-     // @dev Minimum purchase amount per transaction (1 token in wei).
+    // @dev Minimum purchase amount per transaction (1 token in wei).
     uint256 public constant MIN_PURCHASE = 1 ether;
 
-     // @dev Maximum purchase amount per transaction (10,000 tokens in wei).
+    // @dev Maximum purchase amount per transaction (10,000 tokens in wei).
     uint256 public constant MAX_PURCHASE = 10_000 ether;
 
-     // @dev Immutable fee required to create a token, set during deployment.
+    // @dev Immutable fee required to create a token, set during deployment.
     uint256 public immutable fee;
 
-     // @dev Address of the contract owner (deployer), who can withdraw funds.
-    address public owner;
+    // @dev Address of the contract owner (deployer), who can withdraw funds.
+    address public immutable owner;
 
-     // @dev Total number of tokens created.
+    // @dev Total number of tokens created.
     uint256 public totalTokens;
 
-     // @dev Array storing addresses of all created tokens.
+    // @dev Array storing addresses of all created tokens.
     address[] public tokenAddresses;
 
     /**
@@ -72,6 +71,9 @@ contract TokenFactory {
      */
     event Buy(address indexed token, uint256 amount);
 
+    event Deposit(address indexed token, address indexed creator, uint256 tokensTransferred, uint256 ethTransferred);
+    event Withdraw(address indexed owner, uint256 amount);
+
     /**
      * @dev Initializes the contract with a creation fee and sets the owner.
      * @param _fee The fee (in wei) required to create a new token.
@@ -88,6 +90,12 @@ contract TokenFactory {
      */
     function create(string memory _name, string memory _symbol) external payable {
         require(msg.value >= fee, "Factory: Creator fee not met");
+
+        // Refund excess ETH
+        if (msg.value > fee) {
+            (bool success,) = payable(msg.sender).call{value: msg.value - fee}("");
+            require(success, "Factory: Refund failed");
+        }
 
         Token token = new Token(msg.sender, _name, _symbol, TOTAL_SUPPLY);
         tokenAddresses.push(address(token));
@@ -121,6 +129,12 @@ contract TokenFactory {
         uint256 totalPrice = costPerToken * (_amount / 10 ** 18);
         require(msg.value >= totalPrice, "Factory: Insufficient ETH received");
 
+        // Refund excess ETH
+        if (msg.value > totalPrice) {
+            (bool success,) = payable(msg.sender).call{value: msg.value - totalPrice}("");
+            require(success, "Factory: Refund failed");
+        }
+
         sale.sold += _amount;
         sale.raised += totalPrice;
 
@@ -152,12 +166,18 @@ contract TokenFactory {
      */
     function deposit(address _token) external {
         Token token = Token(_token);
-        TokenSale memory sale = tokenToSale[_token];
+        TokenSale storage sale = tokenToSale[_token];
         require(sale.isOpen == false, "Factory: Target not reached");
+        require(sale.raised > 0, "Factory: Already withdrawn");
+
+        // Update state before transfers (checks-effects-interactions)
+        uint256 amountToTransfer = sale.raised;
+        sale.raised = 0;
 
         token.transfer(sale.creator, token.balanceOf(address(this)));
-        (bool success,) = payable(sale.creator).call{value: sale.raised}("");
+        (bool success,) = payable(sale.creator).call{value: amountToTransfer}("");
         require(success, "Factory: ETH transfer failed");
+        emit Deposit(_token, sale.creator, token.balanceOf(address(this)), amountToTransfer);
     }
 
     /**
@@ -166,8 +186,11 @@ contract TokenFactory {
      */
     function withdraw(uint256 _amount) external {
         require(msg.sender == owner, "Factory: Not owner");
+        require(_amount <= address(this).balance, "Factory: Insufficient balance");
+
         (bool success,) = payable(owner).call{value: _amount}("");
         require(success, "Factory: ETH transfer failed");
+        emit Withdraw(owner, _amount);
     }
 
     /**

@@ -1,25 +1,33 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
-
+This is a [Next.js](https://nextjs.org) project bootstrapped with [
+`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 # Web3 dApp with Next.js, Hardhat, and Ethers.js
 
-This project is a decentralized application (dApp) built with **Next.js** (using TypeScript), **Hardhat**, and **ethers.js (v6.15.0)**. It integrates a React-based frontend with smart contracts deployed on the Hardhat local node for development and testing, with instructions for deploying to the Sepolia testnet.
+This project is a decentralized application (dApp) built with **Next.js** (using TypeScript), **Hardhat**, and *
+*ethers.js (v6.15.0)**. It integrates a React-based frontend with smart contracts deployed on the Hardhat local node for
+development and testing, with instructions for deploying to the Sepolia testnet.
 
 ## Why This Setup?
-- **Frontend-First Approach**: Starting with Next.js sets up the user interface and TypeScript environment, making it easier to integrate smart contracts via Hardhat.
+
+- **Frontend-First Approach**: Starting with Next.js sets up the user interface and TypeScript environment, making it
+  easier to integrate smart contracts via Hardhat.
 - **TypeScript Consistency**: Both Next.js and Hardhat support TypeScript, ensuring type safety across the stack.
-- **Modular Structure**: Hardhat is kept in a subdirectory, separating frontend and backend concerns while enabling seamless integration with `ethers.js`.
+- **Modular Structure**: Hardhat is kept in a subdirectory, separating frontend and backend concerns while enabling
+  seamless integration with `ethers.js`.
 - **Local Development**: The Hardhat local node allows fast, cost-free testing without needing testnet ETH.
 - **Scalability**: This setup scales well for complex dApps with multiple contracts and frontend components.
 
 ## Prerequisites
+
 - **Node.js** (v16 or later)
 - **npm** or **yarn**
 - **MetaMask** browser extension
 - **Infura/Alchemy account** (for Sepolia deployment)
-- **Sepolia ETH** (for testnet deployment, available from faucets like [Infura](https://infura.io/faucet) or [Alchemy](https://sepoliafaucet.com))
+- **Sepolia ETH** (for testnet deployment, available from faucets like [Infura](https://infura.io/faucet)
+  or [Alchemy](https://sepoliafaucet.com))
 
 ## Project Structure
+
 ```
 my-web3-app/
 ├── app/
@@ -43,6 +51,7 @@ my-web3-app/
 ## Setup Instructions
 
 ### 1. Initialize the Next.js Project
+
 1. Create a Next.js project with TypeScript:
    ```bash
    npx create-next-app@latest my-web3-app --typescript
@@ -85,6 +94,7 @@ my-web3-app/
    ```
 
 ### 2. Set Up Hardhat with TypeScript
+
 1. Initialize Hardhat in a subdirectory:
    ```bash
    mkdir hardhat && cd hardhat
@@ -136,7 +146,7 @@ my-web3-app/
    }
    ```
 
-5. Create a deployment script (`hardhat/ignition/modules/`):
+5. Create a deployment script (`hardhat/ignition/modules/TokenFactory.ts`):
    ```typescript
    import { ethers } from "hardhat";
 
@@ -192,7 +202,9 @@ my-web3-app/
     - Note the deployed contract address (e.g., `0x...`).
 
 ### 3. Integrate with Next.js
-1. Copy the contract ABI from `hardhat/artifacts/contracts/MyContract.sol/MyContract.json` to your Next.js project or import it dynamically.
+
+1. Copy the contract ABI from `hardhat/artifacts/contracts/MyContract.sol/MyContract.json` to your Next.js project or
+   import it dynamically.
 
 2. Configure MetaMask for the Hardhat local node:
     - In MetaMask, add a custom network:
@@ -304,6 +316,7 @@ my-web3-app/
    ```
 
 ### 4. Run and Test
+
 1. **Start Hardhat Local Node**:
     - Compile contracts:
       ```bash
@@ -320,8 +333,8 @@ my-web3-app/
       ```
     - Deploy (in a separate terminal from `hardhat/`):
       ```bash
-      npx hardhat ignition deplay ignition/modules/Lock.ts --network localhost
-      ```
+      npx hardhat ignition deploy ignition/modules/TokenFactory.ts --network localhost
+    ```
 
 2. **Start Next.js**:
    ```bash
@@ -333,7 +346,9 @@ my-web3-app/
     - Interact with the contract (e.g., click "Set Value to 100").
 
 ### 5. Deploying to Sepolia
+
 To deploy to the Sepolia testnet:
+
 1. Update `hardhat.config.ts`:
    ```typescript
    import { HardhatUserConfig } from "hardhat/config";
@@ -367,7 +382,7 @@ To deploy to the Sepolia testnet:
 3. Deploy to Sepolia:
    ```bash
    cd hardhat
-   npx hardhat ignition deplay ignition/modules/ --network sepolia
+   npx hardhat ignition deploy ignition/modules/ --network sepolia
    ```
     - Note the deployed contract address.
 
@@ -379,19 +394,25 @@ To deploy to the Sepolia testnet:
 
 ## Deploy on Vercel
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+The easiest way to deploy your Next.js app is to use
+the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme)
+from the creators of Next.js.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for
+more details.
 
 ## Additional Resources
-For further assistance, contact the maintainers or search for issues with Next.js, Hardhat, and `ethers@6.15.0` on platforms like X or GitHub.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+For further assistance, contact the maintainers or search for issues with Next.js, Hardhat, and `ethers@6.15.0` on
+platforms like X or GitHub.
+
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically
+optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
 To learn more about Next.js, take a look at the following resources:
 
 - [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
 - [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions
+are welcome!
