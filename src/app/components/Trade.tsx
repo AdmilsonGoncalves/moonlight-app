@@ -2,12 +2,13 @@ import { useEffect, useState } from 'react';
 import { ethers } from 'ethers';
 import Image from 'next/image';
 import TokenData from '@/app/model/token-data';
+import { TokenFactory } from '../../../types/ethers-contracts';
 
 interface TradeProps {
   toggleTrade: (token: TokenData) => void;
   token: TokenData;
   provider: ethers.BrowserProvider;
-  factory: ethers.Contract;
+  factory: TokenFactory;
 }
 
 function Trade({ toggleTrade, token, provider, factory }: TradeProps) {

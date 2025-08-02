@@ -1,10 +1,11 @@
 import { ethers } from "ethers";
+import { TokenFactory } from '../../../types/ethers-contracts';
 
 interface ListProps {
   toggleCreate: () => void;
   fee: string;
   provider: ethers.BrowserProvider;
-  factory: ethers.Contract;
+  factory: TokenFactory;
 }
 
 function List({ toggleCreate, fee, provider, factory }: ListProps) {
